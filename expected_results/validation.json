@@ -1,0 +1,199 @@
+{
+  "validation_date": "2026-10-15",
+  "python": "3.11.14",
+  "platform": "Linux",
+  "device": "cpu",
+  "cpu_threads_used": [
+    4,
+    8
+  ],
+  "packages": {
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.7",
+    "Pillow": "11.3.0",
+    "torch": "2.5.1+cu121",
+    "torchvision": "0.20.1+cu121",
+    "ultralytics": "8.3.233"
+  },
+  "checkpoint": {
+    "inference_only": true,
+    "bytes": 21944746,
+    "sha256": "042469f2c0f3029e4ac9ccc5ba341ca24195cae83860bb5213c57cca85d36be5"
+  },
+  "checks": {
+    "six_raw_input_records": true,
+    "all_twelve_case_method_runs_pass": true,
+    "bundled_seed_replay_matches": true,
+    "measured_raw_filter_cache_consistent": true,
+    "checkpoint_numeric_tensors_preserved": true,
+    "measured_median_png_pairs_consistent": true,
+    "measured_raw_iq_values_preserved": true,
+    "measured_detector_cache_pixels_preserved": true
+  },
+  "examples": [
+    {
+      "kind": "synthetic",
+      "case": "emitter_1",
+      "input_stage": "raw_iq",
+      "samples": 134003,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": -1055437.1265315183,
+          "bandwidth_hz": 9919973.879310416,
+          "modulation_hz": 118904.76330012227,
+          "target_band_fraction_before": 0.05659632720152397,
+          "target_band_fraction_after": 0.9090984735979927,
+          "bandwidth_compression_ratio": 26636.400000000005,
+          "joint_parameter_success": true
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": -1055437.1264578777,
+          "bandwidth_hz": 9923881.74038885,
+          "modulation_hz": 118904.75451854507,
+          "target_band_fraction_before": 0.05659632720152397,
+          "target_band_fraction_after": 0.9090974064742214,
+          "bandwidth_compression_ratio": 26645.600000000006,
+          "joint_parameter_success": true
+        }
+      }
+    },
+    {
+      "kind": "synthetic",
+      "case": "emitter_2",
+      "input_stage": "raw_iq",
+      "samples": 134003,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": 4103993.2343097003,
+          "bandwidth_hz": 5441515.174932233,
+          "modulation_hz": 101951.49311194528,
+          "target_band_fraction_before": 0.045696473958224335,
+          "target_band_fraction_after": 0.5763464816420338,
+          "bandwidth_compression_ratio": 1.0301015212762674,
+          "joint_parameter_success": true
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": 4103993.2390329386,
+          "bandwidth_hz": 5442067.468745274,
+          "modulation_hz": 101952.53172082565,
+          "target_band_fraction_before": 0.045696473958224335,
+          "target_band_fraction_after": 0.5763163419178213,
+          "bandwidth_compression_ratio": 1.0412832589912349,
+          "joint_parameter_success": true
+        }
+      }
+    },
+    {
+      "kind": "synthetic",
+      "case": "emitter_3",
+      "input_stage": "raw_iq",
+      "samples": 134003,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": 3153579.7421695995,
+          "bandwidth_hz": 7574993.303298,
+          "modulation_hz": 56887.44701077037,
+          "target_band_fraction_before": 0.04804619405290402,
+          "target_band_fraction_after": 0.6642521302092994,
+          "bandwidth_compression_ratio": 1.7659016279514221,
+          "joint_parameter_success": true
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": 3153579.8680201746,
+          "bandwidth_hz": 7575573.539640858,
+          "modulation_hz": 56886.556956238295,
+          "target_band_fraction_before": 0.04804619405290402,
+          "target_band_fraction_after": 0.6643265962629664,
+          "bandwidth_compression_ratio": 2.370941406978914,
+          "joint_parameter_success": true
+        }
+      }
+    },
+    {
+      "kind": "measured",
+      "case": "monitor_A",
+      "input_stage": "raw_iq",
+      "samples": 50000,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": 258255.07128397786,
+          "bandwidth_hz": 13480518.846803637,
+          "modulation_hz": 140881.7288139798,
+          "target_band_fraction_before": 0.025036933031793978,
+          "target_band_fraction_after": 0.8594221198496916,
+          "bandwidth_compression_ratio": 19.98389147944044
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": 258347.8458854441,
+          "bandwidth_hz": 13480367.495722426,
+          "modulation_hz": 140878.1024535085,
+          "target_band_fraction_before": 0.025036933031793978,
+          "target_band_fraction_after": 0.8717095977153506,
+          "bandwidth_compression_ratio": 21.87563805104408
+        }
+      }
+    },
+    {
+      "kind": "measured",
+      "case": "monitor_B",
+      "input_stage": "raw_iq",
+      "samples": 50000,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": -104514.53570479491,
+          "bandwidth_hz": 11812736.174327012,
+          "modulation_hz": 37498.74880032753,
+          "target_band_fraction_before": 0.041128992071771286,
+          "target_band_fraction_after": 0.941881214543631,
+          "bandwidth_compression_ratio": 44.393125671321165
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": -67010.25040299585,
+          "bandwidth_hz": 11633340.165548773,
+          "modulation_hz": 37501.405922159196,
+          "target_band_fraction_before": 0.03875526950135752,
+          "target_band_fraction_after": 0.9192935634649474,
+          "bandwidth_compression_ratio": 25.96105527638191
+        }
+      }
+    },
+    {
+      "kind": "measured",
+      "case": "monitor_C",
+      "input_stage": "raw_iq",
+      "samples": 50000,
+      "methods": {
+        "proposed": {
+          "success": true,
+          "fc_hz": -431384.5558224415,
+          "bandwidth_hz": 13340635.567385895,
+          "modulation_hz": 37790.09250529848,
+          "target_band_fraction_before": 0.0371696223517802,
+          "target_band_fraction_after": 0.8301790258059468,
+          "bandwidth_compression_ratio": 14.127158555729984
+        },
+        "baseline": {
+          "success": true,
+          "fc_hz": -431386.604389883,
+          "bandwidth_hz": 13342404.17322696,
+          "modulation_hz": 37791.16980355188,
+          "target_band_fraction_before": 0.0371696223517802,
+          "target_band_fraction_after": 0.8269061812942469,
+          "bandwidth_compression_ratio": 13.894493051981472
+        }
+      }
+    }
+  ]
+}
