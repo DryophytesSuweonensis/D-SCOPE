@@ -30,7 +30,9 @@
     "checkpoint_numeric_tensors_preserved": true,
     "measured_median_png_pairs_consistent": true,
     "measured_raw_iq_values_preserved": true,
-    "measured_detector_cache_pixels_preserved": true
+    "measured_detector_cache_pixels_preserved": true,
+    "alpha_f_pngs_increase_upward": true,
+    "detector_pixels_preserved_after_orientation_conversion": true
   },
   "examples": [
     {

@@ -112,6 +112,36 @@ def png_dimensions(path):
     return struct.unpack(">II", header[16:24])
 
 
+def png_text_metadata(path):
+    fields = {}
+    with path.open("rb") as stream:
+        require(stream.read(8) == b"\x89PNG\r\n\x1a\n", f"Invalid PNG: {path.name}")
+        while True:
+            header = stream.read(8)
+            require(len(header) == 8, f"Truncated PNG: {path.name}")
+            size, kind = struct.unpack(">I4s", header)
+            payload = stream.read(size)
+            require(len(payload) == size and len(stream.read(4)) == 4,
+                    f"Truncated PNG chunk: {path.name}")
+            if kind == b"tEXt":
+                key, separator, value = payload.partition(b"\0")
+                require(bool(separator), f"Invalid PNG text field: {path.name}")
+                fields[key.decode("latin-1")] = value.decode("latin-1")
+            if kind == b"IEND":
+                return fields
+
+
+def check_alpha_f_png(path, metadata):
+    require(png_dimensions(path) == (3841, 3840), f"Unexpected alpha-f PNG dimensions: {path.name}")
+    require(metadata.get("alpha_f_image_orientation") == "alpha_max_at_top",
+            f"PNG metadata must place minimum cyclic frequency at the bottom: {path.name}")
+    fields = png_text_metadata(path)
+    require(fields.get("alpha_f_image_orientation") == "alpha_max_at_top",
+            f"PNG must display cyclic frequency increasing upward: {path.name}")
+    for key in ("alpha_min_hz", "alpha_max_hz"):
+        require(float(fields[key]) == float(metadata[key]), f"Wrong PNG {key}: {path.name}")
+
+
 def load_record(path, expected_samples):
     require(path.is_file(), f"Missing data record: {path}")
     with np.load(path, allow_pickle=False) as record:
@@ -207,7 +237,7 @@ def main():
             inspect_json(results, f"expected_synthetic_{count}_{method}")
             check_synthetic(metadata, count, results)
         image = root / str(relative_path(metadata["alpha_f_image"]))
-        require(png_dimensions(image) == (3841, 3840), f"Unexpected synthetic PNG dimensions: {image.name}")
+        check_alpha_f_png(image, metadata)
         print(f"Verified {path.relative_to(root)}: 134003 samples; expected estimates meet accuracy thresholds")
     for monitor in ("A", "B", "C"):
         path = root / f"data/measured/monitor_{monitor}.npz"
@@ -246,12 +276,11 @@ def main():
         image_name = metadata.get("alpha_f_image")
         require(image_name is not None, f"Missing measured alpha-f image metadata: {path.name}")
         image = root / str(relative_path(image_name))
-        require(png_dimensions(image) == (3841, 3840), f"Unexpected measured PNG dimensions: {image.name}")
+        check_alpha_f_png(image, metadata)
         before_image = root / f"data/measured/monitor_{monitor}_alpha_f_before_median.png"
         after_image = root / f"data/measured/monitor_{monitor}_alpha_f_after_median.png"
         for pair_image in (before_image, after_image):
-            require(png_dimensions(pair_image) == (3841, 3840),
-                    f"Unexpected median-comparison PNG dimensions: {pair_image.name}")
+            check_alpha_f_png(pair_image, metadata)
         require(sha256(after_image) == sha256(image),
                 f"After-median image differs from the detector cache: {after_image.name}")
         require(sha256(before_image) != sha256(after_image),

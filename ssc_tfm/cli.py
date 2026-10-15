@@ -9,8 +9,8 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from PIL import Image
 
+from .alpha_images import DETECTOR_ORIENTATION, DISPLAY_ORIENTATION, read_alpha_f_image, save_alpha_f_image
 from .estimation import EstimationConfig, demodulate, estimate, load_detector, prepare_input_iq
 
 RELEASE_ROOT = Path(__file__).resolve().parents[1]
@@ -129,6 +129,10 @@ def save_results(out: Path, iq: np.ndarray, cfg: EstimationConfig, metadata: dic
         result["joint_parameter_success"] = bool(abs(result["fc_hz_error"]) <= 0.5e6 and
                                                  abs(result["bandwidth_hz_error"]) <= 0.5e6 and
                                                  result["modulation_relative_error"] <= 0.001)
+    if image is not None:
+        result["alpha_f_png_orientation"] = DISPLAY_ORIENTATION
+        if isinstance(result.get("coarse"), dict) and "box_xyxy" in result["coarse"]:
+            result["coarse"]["box_coordinate_orientation"] = DETECTOR_ORIENTATION
     write_json(out / "parameters.json", {**result, "sample_count": len(iq), "fs_hz": cfg.fs_hz,
                                          "config": asdict(cfg), "source_metadata": metadata,
                                          "metric_definitions": {
@@ -150,7 +154,7 @@ def save_results(out: Path, iq: np.ndarray, cfg: EstimationConfig, metadata: dic
     np.savetxt(out / "spectra.csv", np.column_stack((freqs[select], before_db[select], after_db[select])),
                delimiter=",", header="frequency_hz,before_normalized_db,after_normalized_db", comments="")
     if image is not None:
-        Image.fromarray(image).save(out / "alpha_f.png")
+        save_alpha_f_image(image, out / "alpha_f.png", cfg.alpha_min_hz, cfg.alpha_max_hz)
     if plots:
         import matplotlib
         matplotlib.use("Agg")
@@ -215,7 +219,7 @@ def run_cli(kind: str) -> int:
             if not image_path.is_file():
                 image_path = path.parent / image_name
             if image_path.is_file():
-                image = np.asarray(Image.open(image_path).convert("L"), dtype=np.uint8)
+                image = read_alpha_f_image(image_path, metadata.get("alpha_f_image_orientation"))
                 image_source = "bundled_alpha_f_image"
         for method in methods:
             out = args.output.resolve() / path.stem / method

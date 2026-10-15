@@ -18,7 +18,9 @@ Demodulation operates on the band-filtered I/Q. Synthetic inputs do not use
 this front-end filter.
 
 NPZ files contain raw I/Q; PNG files contain alpha–frequency images derived
-from that I/Q.
+from that I/Q. Every alpha–frequency PNG places the minimum cyclic frequency
+at the bottom and the maximum at the top. The runners restore the detector's
+input orientation automatically before inference.
 
 The following PNGs are provided for each of A, B and C:
 
@@ -89,3 +91,11 @@ Arbitrary new records are not guaranteed to pass the accuracy thresholds.
 Place this folder's contents at the repository root. The inference checkpoint
 is about 22 MB. Use the Git commands in the README to upload this release;
 the original working directory is not required.
+
+To update an existing repository after editing this release:
+
+```bash
+git add -A
+git commit -m "Fix cyclic frequency axis orientation"
+git push origin main
+```

@@ -105,7 +105,8 @@
     "has_ground_truth": false,
     "raw_iq_sha256": "cd62bae932c2d1107bc0409d09157d812127bfb03e9b6ef7ba1af48ea75dc700",
     "processing_iq_sha256": "364a5c4f5b6768f2e7c209db239f10437d76bc62c9fc04084dded779ad443108",
-    "alpha_f_image_sha256": "c22b8c5ccb8fba5ba341e74152e751739e76afb42dbf28aa04c889aa4f3f9d8b"
+    "alpha_f_image_sha256": "18f339eca44bfb006df3612e57a12b095b9826905e57bd8008c82a5a10148e7b",
+    "alpha_f_image_orientation": "alpha_max_at_top"
   },
   "metric_definitions": {
     "spectrum": "Hann window, FFT length max(262144, record samples)",

@@ -22,7 +22,8 @@
       2333.63232421875,
       3074.1708984375
     ],
-    "detector_runtime_ms": 2486.627569422126
+    "detector_runtime_ms": 2486.627569422126,
+    "box_coordinate_orientation": "alpha_min_at_top"
   },
   "runtime_ms": 7081.580555066466,
   "input_file": "emitter_2.npz",
@@ -125,7 +126,7 @@
     "median_kernel": 9,
     "alpha_f_image": "data/synthetic/emitter_2_alpha_f.png",
     "iq_sha256": "8a7ae75d755a72ac5cf2de74eb25d219772043335ebff84406661fb000579424",
-    "alpha_f_image_sha256": "0905f74160d64c7b44c3341a95a9a36174e61e57aaa53a451e396482c1b97de2",
+    "alpha_f_image_sha256": "33d020a7c0d4a394db81c3acd9cd30aa30abd0d049a2edcd88fdf41a691da722",
     "components": [
       {
         "component_index": 0,
@@ -156,7 +157,8 @@
       "fc_hz": 4103986.393205215,
       "bandwidth_hz": 5441455.015260486,
       "modulation_hz": 101951.90419810163
-    }
+    },
+    "alpha_f_image_orientation": "alpha_max_at_top"
   },
   "metric_definitions": {
     "spectrum": "Hann window, FFT length max(262144, record samples)",

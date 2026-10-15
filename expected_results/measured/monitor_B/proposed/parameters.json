@@ -22,7 +22,8 @@
       2232.675048828125,
       520.0004272460938
     ],
-    "detector_runtime_ms": 2661.796808242798
+    "detector_runtime_ms": 2661.796808242798,
+    "box_coordinate_orientation": "alpha_min_at_top"
   },
   "runtime_ms": 7847.926873713732,
   "input_file": "monitor_B.npz",
@@ -124,7 +125,8 @@
     "has_ground_truth": false,
     "raw_iq_sha256": "e64d5d8f2007d03becb8f0a04e6220890e631116de0836cd69f80892496e76b6",
     "processing_iq_sha256": "d07ea7af1fa0e046791607f5b2406bfdfd9e6253738bf6a8dc34d647611f3b89",
-    "alpha_f_image_sha256": "9aa31119535b3f17f1bfb97295daf479b67f05dd0fcd4c478e2786549fda25cf"
+    "alpha_f_image_sha256": "e7dfc78844de12fee96bebed3a4ad22f9119ddc3082590eeea8393441ebbd836",
+    "alpha_f_image_orientation": "alpha_max_at_top"
   },
   "metric_definitions": {
     "spectrum": "Hann window, FFT length max(262144, record samples)",

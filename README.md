@@ -68,7 +68,11 @@ map. Demodulation operates on the band-filtered measured I/Q. Synthetic I/Q
 does not use this front-end filter.
 
 Cached PNGs are **derived detector inputs**, included alongside the raw I/Q
-for fast tests. They are not the raw signals. To recalculate them:
+for fast tests. They are not the raw signals. All alpha–frequency PNGs show
+**minimum cyclic frequency at the bottom and maximum at the top**. The runners
+automatically convert that display orientation to the detector's input layout.
+Logged detector-box coordinates use the layout recorded in
+`coarse.box_coordinate_orientation`. To recalculate the images:
 
 ```bash
 python scripts/run_measured.py --case A --recompute-image --device cpu --output outputs/full_processing
@@ -131,7 +135,7 @@ Each has `summary.csv` and case/method subdirectories with:
 - `spectra.npz`: full linear spectra
 - `spectra.csv`: compact spectra with preserved local peaks
 - `spectrum.png`, `spectrum.pdf`: before/after comparison
-- `alpha_f.png`: detector image when used
+- `alpha_f.png`: detector image displayed with cyclic frequency increasing upward
 
 `success` means execution completed. Synthetic `joint_parameter_success`
 requires center-frequency and bandwidth errors ≤500 kHz and modulation-rate
@@ -208,3 +212,12 @@ git push -u origin main
 Replace the account/repository placeholders. `outputs/`, virtual environments
 and Python caches are excluded by `.gitignore`. See
 [GitHub upload instructions](https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository).
+
+To upload later changes to an already configured repository, run these
+commands from the release folder:
+
+```bash
+git add -A
+git commit -m "Fix cyclic frequency axis orientation"
+git push origin main
+```

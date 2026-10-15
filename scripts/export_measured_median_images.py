@@ -5,6 +5,8 @@ Both branches start from the configured band-filtered I/Q, use phase-only
 normalization and instantaneous frequency, and reconstruct 49,999 complex
 samples. Only the after branch applies the IF median filter. Each alpha-f map
 uses its own linear minimum/maximum normalization, matching the detector cache.
+Exported images place the maximum cyclic frequency at the top. Detector arrays
+retain the internal orientation with the minimum cyclic frequency at the top.
 Raw NPZ records and the canonical after-median caches selected by metadata
 are read only.
 """
@@ -19,11 +21,17 @@ import shutil
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from ssc_tfm.cli import load_record
+from ssc_tfm.alpha_images import (
+    DETECTOR_ORIENTATION,
+    DISPLAY_ORIENTATION,
+    read_alpha_f_image,
+    save_alpha_f_image,
+)
 from ssc_tfm.estimation import (
     EstimationConfig,
     instantaneous_frequency,
@@ -47,26 +55,31 @@ def without_if_median(iq: np.ndarray, cfg: EstimationConfig) -> np.ndarray:
 
 def comparison_sheet(rows: list[dict], output: Path) -> None:
     """Make an overview; full-resolution numerical maps remain separate PNGs."""
-    panel = 640
-    top = 100
-    row_height = panel + 50
-    canvas = Image.new("RGB", (panel * 2, top + row_height * len(rows)), "white")
-    draw = ImageDraw.Draw(canvas)
-    try:
-        font = ImageFont.truetype("DejaVuSans.ttf", 28)
-    except OSError:
-        font = ImageFont.load_default(size=28)
-    draw.text((24, 30), "Before IF median", fill="black", font=font)
-    draw.text((panel + 24, 30), "After IF median (k=9)", fill="black", font=font)
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, axes = plt.subplots(len(rows), 2, figsize=(10, 4.2 * len(rows)),
+                             squeeze=False, constrained_layout=True)
     for index, row in enumerate(rows):
-        y = top + index * row_height
-        draw.text((24, y), f'Monitor {row["monitor"]}', fill="black", font=font)
+        cfg = row["config"]
+        alpha_min, alpha_max = cfg["alpha_min_hz"] / 1e3, cfg["alpha_max_hz"] / 1e3
+        extent = [-cfg["fs_hz"] / 2e6, cfg["fs_hz"] / 2e6, alpha_min, alpha_max]
         for column, key in enumerate(("before_path", "after_path")):
             with Image.open(row[key]) as source:
-                thumb = source.convert("RGB").resize((panel, panel), Image.Resampling.LANCZOS)
-            canvas.paste(thumb, (column * panel, y + 45))
+                display = np.asarray(source.convert("L"), dtype=np.uint8)
+            ax = axes[index, column]
+            ax.imshow(display, cmap="gray", origin="upper", extent=extent,
+                      aspect="auto", vmin=0, vmax=255, interpolation="nearest")
+            ax.set(xlabel="Baseband frequency (MHz)", ylim=(alpha_min, alpha_max),
+                   yticks=[alpha_min, 50, 75, 100, 125, alpha_max])
+            if column == 0:
+                ax.set_ylabel(f'Monitor {row["monitor"]}\nCyclic frequency (kHz)')
+            if index == 0:
+                ax.set_title("Before IF median" if column == 0 else f'After IF median (k={cfg["median_kernel"]})')
     output.parent.mkdir(parents=True, exist_ok=True)
-    canvas.save(output)
+    fig.savefig(output, dpi=160)
+    plt.close(fig)
 
 
 def main() -> int:
@@ -118,21 +131,26 @@ def main() -> int:
         if before_path.resolve() == cache:
             raise RuntimeError("The before-median output cannot replace the canonical detector cache.")
         same_after_path = after_path.resolve() == cache
-        Image.fromarray(before).save(before_path)
-        with Image.open(cache) as source:
-            cached = np.asarray(source.convert("L"), dtype=np.uint8)
+        cache_orientation = metadata.get("alpha_f_image_orientation")
+        if cache_orientation is None:
+            with Image.open(cache) as source:
+                cache_orientation = source.info.get("alpha_f_image_orientation", DETECTOR_ORIENTATION)
+        if same_after_path and cache_orientation != DISPLAY_ORIENTATION:
+            raise RuntimeError("The canonical cache must already use the display orientation when it is also the after-median output.")
+        save_alpha_f_image(before, before_path, alpha_min_hz=cfg.alpha_min_hz, alpha_max_hz=cfg.alpha_max_hz)
+        cached = read_alpha_f_image(cache, orientation=cache_orientation)
         same_shape = after.shape == cached.shape
         same_pixels = same_shape and np.array_equal(after, cached)
         difference = np.abs(after.astype(np.int16) - cached.astype(np.int16)) if same_shape else None
-        if same_pixels:
+        if same_pixels and cache_orientation == DISPLAY_ORIENTATION:
             # Regeneration has been checked. Preserve the cache's exact PNG
             # encoding as well as its pixels in the explicit after image.
             if not same_after_path:
                 shutil.copyfile(cache, after_path)
         else:
             if not same_after_path:
-                Image.fromarray(after).save(after_path)
-            mismatch = True
+                save_alpha_f_image(after, after_path, alpha_min_hz=cfg.alpha_min_hz, alpha_max_hz=cfg.alpha_max_hz)
+            mismatch = not same_pixels or mismatch
         record_unchanged = sha256(record_path) == record_hash_before
         cache_unchanged = sha256(cache) == cache_hash_before
         if not record_unchanged or not cache_unchanged:
@@ -147,6 +165,8 @@ def main() -> int:
             "before_path": str(before_path),
             "after_path": str(after_path),
             "normalization": "Each map independently uses linear minimum/maximum normalization to uint8 0..255.",
+            "display_orientation": DISPLAY_ORIENTATION,
+            "detector_orientation": DETECTOR_ORIENTATION,
             "before_stage": "front_end_filtered_iq -> phase_only -> instantaneous_frequency -> phase_reconstruction",
             "after_stage": "front_end_filtered_iq -> phase_only -> instantaneous_frequency -> median_filter -> phase_reconstruction",
             "config": asdict(cfg),

@@ -13,6 +13,10 @@ threads. Package versions are pinned in `requirements.txt`.
 - Measured A/B/C also have explicit before/after IF median PNG pairs.
   Their input length and phase reconstruction agree; only median filtering
   differs. After-median PNGs serve as the detector caches.
+- All nine alpha–frequency data PNGs display cyclic frequency increasing
+  upward. Their PNG tags and NPZ metadata record this orientation. Loading a
+  display PNG restores the detector's input pixels exactly; detector outputs
+  were checked for numerical equality before and after this conversion.
 - Anonymous data/configuration hashes and `SHA256SUMS` detect file changes.
 
 The measured runner applies its front-end filter at execution time.
